@@ -1,0 +1,6 @@
+{
+  "name": "MilesAre",
+  "description": "Anonymous Confession Social App - Share confessions, secrets, thoughts, and personal stories with complete privacy.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

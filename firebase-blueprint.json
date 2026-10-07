@@ -1,0 +1,123 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Private user account profile linked to Google Auth",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The Firebase UID of user" },
+        "displayName": { "type": "string", "description": "Google display name (kept private)" },
+        "anonymousName": { "type": "string", "description": "Current active anonymous alias" },
+        "anonymousAvatar": { "type": "string", "description": "Avatar preset icon key" },
+        "bio": { "type": "string", "description": "Anonymous biography" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account creation server timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Account update server timestamp" }
+      },
+      "required": ["userId", "anonymousName", "anonymousAvatar"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "Anonymous confession or story shared by a user",
+      "type": "object",
+      "properties": {
+        "postId": { "type": "string", "description": "Unique post identifier" },
+        "authorId": { "type": "string", "description": "Author UID used only for security validation" },
+        "anonymousName": { "type": "string", "description": "Public anonymous handle for this post" },
+        "anonymousAvatar": { "type": "string", "description": "Avatar style key for this post" },
+        "category": { "type": "string", "description": "Confession category" },
+        "content": { "type": "string", "description": "Confession text body" },
+        "contentWarning": { "type": "string", "description": "Optional content sensitivity warning" },
+        "commentsEnabled": { "type": "boolean", "description": "Whether comments are open" },
+        "reactionsEnabled": { "type": "boolean", "description": "Whether reactions are open" },
+        "reactionCount": { "type": "integer", "description": "Total number of reactions" },
+        "commentCount": { "type": "integer", "description": "Total number of comments" },
+        "saveCount": { "type": "integer", "description": "Total number of bookmarks" },
+        "isArchived": { "type": "boolean", "description": "Whether post is archived" },
+        "isDeleted": { "type": "boolean", "description": "Soft delete flag" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last updated timestamp" }
+      },
+      "required": ["postId", "authorId", "anonymousName", "anonymousAvatar", "category", "content"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "Anonymous response to a confession post",
+      "type": "object",
+      "properties": {
+        "commentId": { "type": "string", "description": "Unique comment identifier" },
+        "postId": { "type": "string", "description": "Parent confession post ID" },
+        "authorId": { "type": "string", "description": "Author UID used for access control" },
+        "anonymousName": { "type": "string", "description": "Anonymous display handle for commenter" },
+        "anonymousAvatar": { "type": "string", "description": "Avatar preset icon key" },
+        "content": { "type": "string", "description": "Comment text content" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["commentId", "postId", "authorId", "anonymousName", "content"]
+    },
+    "Reaction": {
+      "title": "Reaction",
+      "description": "Anonymous reaction attached to a post",
+      "type": "object",
+      "properties": {
+        "reactionId": { "type": "string", "description": "Unique reaction identifier" },
+        "postId": { "type": "string", "description": "Target post ID" },
+        "userId": { "type": "string", "description": "Reacting user UID" },
+        "reactionType": { "type": "string", "enum": ["love", "sad", "funny", "wow", "angry", "relatable"], "description": "Reaction emoji key" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Reaction timestamp" }
+      },
+      "required": ["reactionId", "postId", "userId", "reactionType"]
+    },
+    "SavedPost": {
+      "title": "SavedPost",
+      "description": "Private bookmark reference for a post",
+      "type": "object",
+      "properties": {
+        "saveId": { "type": "string", "description": "Saved post doc ID" },
+        "userId": { "type": "string", "description": "User who saved the post" },
+        "postId": { "type": "string", "description": "Target post ID" },
+        "savedAt": { "type": "string", "format": "date-time", "description": "Bookmark timestamp" }
+      },
+      "required": ["saveId", "userId", "postId"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Flag submitted for safety and moderation review",
+      "type": "object",
+      "properties": {
+        "reportId": { "type": "string", "description": "Unique report ID" },
+        "reporterId": { "type": "string", "description": "User UID who reported content" },
+        "targetType": { "type": "string", "description": "post or comment" },
+        "targetId": { "type": "string", "description": "ID of flagged entity" },
+        "reason": { "type": "string", "description": "Moderation category explanation" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Report timestamp" }
+      },
+      "required": ["reportId", "reporterId", "targetType", "targetId", "reason"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User account document, strictly private to owner"
+    },
+    "/posts/{postId}": {
+      "schema": "Post",
+      "description": "Public anonymous confessions feed"
+    },
+    "/posts/{postId}/comments/{commentId}": {
+      "schema": "Comment",
+      "description": "Public anonymous comments on confessions"
+    },
+    "/posts/{postId}/reactions/{reactionId}": {
+      "schema": "Reaction",
+      "description": "Anonymous reactions on confessions"
+    },
+    "/users/{userId}/saved_posts/{saveId}": {
+      "schema": "SavedPost",
+      "description": "Private bookmarks for the user"
+    },
+    "/reports/{reportId}": {
+      "schema": "Report",
+      "description": "Content safety reports for moderation"
+    }
+  }
+}
